@@ -1,0 +1,25 @@
+node_modules/
+dist/
+.DS_Store
+artifacts/
+.tools/
+test-results/
+GetYa-share.zip
+
+# Local credentials and account settings must never be committed.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+.npmrc
+.aws/
+.codex/
+.agents/
+
+# Keep original font bundles and raw Figma capture records local.
+MonaFont-ttf/
+MonaFont-otf/
+design/
