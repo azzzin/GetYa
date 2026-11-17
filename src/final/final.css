@@ -14,3 +14,15 @@
 .final-empty-review { color: #666; }
 .final-local-note { position: fixed; z-index: 20; bottom: 8px; left: 8px; max-width: calc(100vw - 16px); background: #101b35; color: #b9e84c; border: 1px solid #b9e84c; padding: 7px 12px; font-size: 12px; }
 .final-game .game-stage[data-typing="false"] .ending-letter.is-visible { animation: none; opacity: 1; transform: none; }
+.final-game [data-transition-kind="noise"] .visual-layers { animation: tv-static-drift 320ms steps(4, end) infinite; transform-origin: center; }
+.final-game [data-transition-kind="warning"] .visual-layers { animation: tv-static-clear 450ms ease-out both; }
+@keyframes tv-static-drift {
+  0%, 100% { transform: scale(1.008) translate(0, 0); }
+  25% { transform: scale(1.008) translate(-2px, 1px); }
+  50% { transform: scale(1.008) translate(2px, -1px); }
+  75% { transform: scale(1.008) translate(-1px, -2px); }
+}
+@keyframes tv-static-clear { from { opacity: .65; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .final-game [data-transition-kind] .visual-layers { animation: none; }
+}

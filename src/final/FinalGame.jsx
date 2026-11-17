@@ -3,6 +3,7 @@ import FinalLayers from './FinalLayers.jsx';
 import DialogueAdvance from '../components/DialogueAdvance.jsx';
 import { useReveal } from './useReveal.js';
 import { assetUrl } from '../assetUrl.js';
+import { autoTransitionDelay } from './transitionTiming.js';
 import scenes from './data/scenes.json';
 import layouts from './data/layouts.json';
 import './design.css';
@@ -39,6 +40,7 @@ export default function FinalGame() {
   const [review, setReview] = useState('');
   const [reviews, setReviews] = useState(readReviews);
   const reveal = useReveal(scene);
+  const automaticDelay = autoTransitionDelay(scene, scenes[scene.next]);
 
   useEffect(() => {
     const resize = () => setViewport({ width: innerWidth, height: innerHeight });
@@ -63,6 +65,16 @@ export default function FinalGame() {
     const handle = setTimeout(() => setNotice(''), 5000);
     return () => clearTimeout(handle);
   }, [notice]);
+  useEffect(() => {
+    if (automaticDelay == null || !scene.next) return;
+    let cancelled = false;
+    let handle;
+    // Start timing only after the static/background images are ready to show.
+    Promise.all([...stage.current.querySelectorAll('img')].map(image => image.decode().catch(() => {}))).then(() => {
+      if (!cancelled) handle = setTimeout(() => setSceneId(scene.next), automaticDelay);
+    });
+    return () => { cancelled = true; clearTimeout(handle); };
+  }, [sceneId, scene.next, automaticDelay]);
 
   const go = target => { if (scenes[target]) setSceneId(target); };
   const next = () => { if (reveal.typing) reveal.finish(); else if (scene.next) go(scene.next); };
@@ -88,20 +100,19 @@ export default function FinalGame() {
     if (scene.next || reveal.typing) { event.preventDefault(); next(); }
   };
   const sound = () => setNotice('음악과 효과음은 아직 연결되지 않았습니다.');
-  const fullFrameClick = ['noise', 'warning'].includes(scene.kind);
   const buttonLinks = scene.links.filter(link => link.id !== scene.id && (!scene.next || link.label));
 
   return <main className="game-shell final-game">
     <div className="stage-wrapper" style={{ width: scene.width * scale, height: scene.height * scale }}>
       <section ref={stage} tabIndex={-1} className="game-stage" style={{ width: scene.width, height: scene.height, transform: `scale(${scale})` }}
-        data-scene-id={sceneId} data-typing={reveal.typing} onKeyDown={keyDown} aria-label={scene.name}>
+        data-scene-id={sceneId} data-transition-kind={automaticDelay != null ? scene.kind : undefined}
+        data-typing={reveal.typing} onKeyDown={keyDown} aria-label={scene.name}>
         <div className="visual-layers"><FinalLayers layer={layouts[sceneId]} scene={scene} activeDoor={activeDoor} reveal={reveal}
           actions={{ home, sound, start, assetError: () => setNotice('이미지를 불러오지 못했습니다.') }} /></div>
 
         {scene.next && !['start', 'noise', 'warning'].includes(scene.kind) &&
           <DialogueAdvance sceneId={sceneId} scale={scale} onAdvance={next} />}
         {!scene.next && reveal.typing && <DialogueAdvance sceneId={sceneId} scale={scale} onAdvance={next} />}
-        {fullFrameClick && scene.next && <button type="button" className="final-frame-next" aria-label="다음 대사" onClick={next} />}
 
         {!['start', 'review'].includes(scene.kind) && buttonLinks.map((link, i) =>
           <Target key={link.id} link={link} disabled={selecting} onClick={() => activate(link, i)}

@@ -3,8 +3,8 @@ import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
 
-test('review deployment preserves the published MVP and serves the final preview separately', async ({ page }) => {
-  const root = resolve('pages-review');
+test('published root serves the latest design and preserves the MVP comparison', async ({ page }) => {
+  const root = resolve('dist');
   const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.ttf': 'font/ttf' };
   const server = createServer(async (request, response) => {
     const path = new URL(request.url, 'http://localhost').pathname;
@@ -20,17 +20,15 @@ test('review deployment preserves the published MVP and serves the final preview
     const origin = `http://127.0.0.1:${server.address().port}/GetYa/`;
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
-    await page.goto(origin);
+    await page.goto(origin + '?version=mvp');
     await expect(page.locator('.game-stage')).toHaveAttribute('data-scene-id', '1:295');
-    await page.goto(origin + 'final-preview/');
+    await page.goto(origin);
     await expect(page.locator('.game-stage')).toHaveAttribute('data-scene-id', '32:703');
     await page.getByRole('button', { name: '게임 시작', exact: true }).first().click();
     await page.getByRole('button', { name: '친구', exact: true }).click();
     await expect(page.locator('.game-stage')).toHaveAttribute('data-scene-id', '32:403');
     await page.evaluate(async () => { await document.fonts.ready; await Promise.all([...document.images].map(img => img.decode())); });
     expect(await page.evaluate(() => [...document.images].every(img => img.naturalWidth > 0))).toBe(true);
-    await page.goto(origin + 'final-preview/?scene=32:905');
-    await expect(page.locator('.game-stage')).toHaveAttribute('data-scene-id', '32:905');
     expect(errors).toEqual([]);
   } finally { await new Promise(accept => server.close(accept)); }
 });

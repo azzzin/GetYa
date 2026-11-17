@@ -2,7 +2,7 @@ name: Deploy Get-Ya to GitHub Pages
 
 on:
   push:
-    branches: [main, final-design]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -31,13 +31,10 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
-      - name: Preserve main site and add final review preview
-        if: github.ref_name == 'final-design'
-        run: node scripts/build_preview_site.mjs
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with:
-          path: ${{ github.ref_name == 'final-design' && 'pages-review' || 'dist' }}
+          path: dist
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5

@@ -1,6 +1,6 @@
 # 겟야! Get-Ya!
 
-현재 `final-design` 브랜치에서는 최신 Figma의 53개 프레임과 프로토타입을 반영한 컨펌용 버전을 작업합니다. [최종 디자인 검토 안내](FINAL_REVIEW_GUIDE.md)를 참고하세요. 이 브랜치 배포는 기존 공개 게임을 유지하고 `/final-preview/`에만 새 버전을 추가합니다. 아래의 기존 MVP 설명은 비교용으로 남겨 두었습니다.
+최신 Figma의 53개 프레임과 프로토타입을 반영했습니다. 기존 공개 주소 https://azzzin.github.io/GetYa/ 에서 최신 버전을 공유합니다. [최종 디자인 검토 안내](FINAL_REVIEW_GUIDE.md)를 참고하세요. 노이즈 두 화면(650ms, 500ms)과 경고창(700ms)은 자동으로 지나간 뒤 엔딩으로 연결됩니다. 아래 기존 MVP 설명은 비교용입니다.
 
 로컬 기본 주소는 최종 디자인이며, `?version=mvp`는 이전 MVP 비교, `?endingPreview=career`와 `?endingPreview=friend`는 기존 엔딩 효과 테스트입니다. 음악은 아직 없습니다. 후기는 이 브라우저에만 저장되고 다른 사용자와 공유되지 않습니다.
 

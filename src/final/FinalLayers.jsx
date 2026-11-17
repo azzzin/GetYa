@@ -1,6 +1,6 @@
 import { createElement } from 'react';
 import { assetUrl } from '../assetUrl.js';
-import { alignedDoorImage } from '../data/doorStates.js';
+import { alignedDoorImage, originalNextArrow } from '../data/doorStates.js';
 import content from './data/content.json';
 
 const standard = { closed: '/assets/33dea9ce-f866-42c5-a391-67e14772f796.png', open: '/assets/987c9697-34df-47b7-868f-5643ee0dc192.png' };
@@ -17,6 +17,7 @@ export default function FinalLayers({ layer, scene, activeDoor, actions, reveal 
   const { tag, children, ...props } = layer;
   const id = props['data-node-id'];
   const name = props['data-name'] ?? '';
+  if (['noise', 'warning'].includes(scene.kind) && tag === 'img' && props.src === originalNextArrow) return null;
   if (['32:718', '32:720'].includes(id)) return null;
   if (['choice', 'topics'].includes(scene.kind) && /^(열린 문|닫힌 문|문 )/.test(name)) {
     const index = scene.kind === 'topics' ? (name === '문 3' ? 1 : 0) : name.startsWith('열린') ? 1 : 0;

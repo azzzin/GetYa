@@ -32,7 +32,10 @@ test('final prototype paths reach both endings, including the added fourth caree
         }
         if (id === ending) break;
         const scene = scenes[id];
-        if (scene.kind === 'choice') {
+        if (['noise', 'warning'].includes(scene.kind)) {
+          await expect(page.locator('.game-stage')).not.toHaveAttribute('data-scene-id', id);
+          continue;
+        } else if (scene.kind === 'choice') {
           const index = (path >> choiceIndex++) & 1;
           await page.locator(`[data-link-id="${scene.links[index].id}"]`).click();
         } else {
@@ -72,7 +75,7 @@ test('epilogue, review entry and local review list are interactive without stori
   expect(await page.evaluate(() => Object.keys(localStorage).some(key => /password|token/i.test(key)))).toBe(false);
 });
 
-test('start screen and both doors render, noise follows click connections, no audio is requested', async ({ page }) => {
+test('start screen and both doors render, noise automatically clears, no audio is requested', async ({ page }) => {
   const audioRequests = [];
   page.on('request', request => { if (/\.(mp3|wav|ogg)(\?|$)/.test(request.url())) audioRequests.push(request.url()); });
   await page.goto('/');
@@ -90,8 +93,32 @@ test('start screen and both doors render, noise follows click connections, no au
     await expect(page.locator('.game-stage')).toHaveAttribute('data-scene-id', id);
     await ready(page);
     await page.screenshot({ path: `artifacts/final/${id.replace(':', '-')}.png` });
-    await page.getByRole('button', { name: '다음 대사', exact: true }).click();
+    await expect(page.getByRole('button', { name: '다음 대사', exact: true })).toHaveCount(0);
+    await expect(page.locator('.game-stage')).not.toHaveAttribute('data-scene-id', id);
   }
   await expect(page.locator('.game-stage')).toHaveAttribute('data-scene-id', '32:1851');
   expect(audioRequests).toEqual([]);
+});
+
+for (const [topic, ids] of [
+  ['friend', ['32:2426', '32:2422', '32:1927', '32:1851']],
+  ['career', ['32:2437', '32:2433', '32:2430', '32:1930']],
+]) {
+  test(`${topic} TV sequence advances without clicks and stops at the ending`, async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto(`/?scene=${ids[0]}&typing=off`);
+    for (const id of ids) await expect(page.locator('.game-stage')).toHaveAttribute('data-scene-id', id);
+    // A later automatic transition must not advance the ending dialogue itself.
+    await expect(async () => {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      await expect(page.locator('.game-stage')).toHaveAttribute('data-scene-id', ids.at(-1));
+    }).toPass({ timeout: 2000 });
+  });
+}
+
+test('leaving static cancels its scheduled transition', async ({ page }) => {
+  await page.goto('/?scene=32:2426&typing=off');
+  await page.getByRole('button', { name: '처음으로', exact: true }).click();
+  await page.waitForTimeout(2200);
+  await expect(page.locator('.game-stage')).toHaveAttribute('data-scene-id', '32:703');
 });
