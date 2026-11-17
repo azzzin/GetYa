@@ -32,7 +32,7 @@ test('all 16 choice paths reach their ending; original assets render and restart
   page.on('pageerror', error => errors.push(error.message));
   const seen = new Set();
   await mkdir('artifacts/screenshots', { recursive: true });
-  await page.goto('/');
+  await page.goto('/?version=mvp');
   await waitForAssets(page);
   await page.screenshot({ path: 'artifacts/screenshots/start.png' });
   await expect(page.locator('#password')).toBeEditable();
@@ -51,9 +51,11 @@ test('all 16 choice paths reach their ending; original assets render and restart
           await waitForAssets(page);
           if (scene.next && scene.kind !== 'result') {
             const button = await page.getByRole('button', { name: '다음 대사', exact: true }).boundingBox();
-            const arrow = await page.locator('.next-arrow-control > .pixel-next-arrow').boundingBox();
-            expect(Math.abs(button.x + button.width / 2 - arrow.x - arrow.width / 2)).toBeLessThan(0.1);
-            expect(Math.abs(button.y + button.height / 2 - arrow.y - arrow.height / 2)).toBeLessThan(0.1);
+            const arrow = await page.locator('.pixel-next-arrow').boundingBox();
+            expect(arrow.x).toBeGreaterThanOrEqual(button.x);
+            expect(arrow.y).toBeGreaterThanOrEqual(button.y);
+            expect(arrow.x + arrow.width).toBeLessThanOrEqual(button.x + button.width + 1);
+            expect(arrow.y + arrow.height).toBeLessThanOrEqual(button.y + button.height + 1);
           }
           await page.screenshot({ path: `artifacts/screenshots/scene-${id.replace(':', '-')}.png` });
           seen.add(id);
@@ -80,7 +82,7 @@ test('all 16 choice paths reach their ending; original assets render and restart
 });
 
 test('Mona fonts, home, keyboard controls, pending audio and smaller viewports', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/?version=mvp');
   await waitForAssets(page);
   const fonts = await page.evaluate(() => [...document.fonts].map(font => ({ family: font.family, status: font.status })));
   expect(fonts.every(font => font.family === 'Mona12' && font.status === 'loaded')).toBe(true);
@@ -113,7 +115,7 @@ test('Mona fonts, home, keyboard controls, pending audio and smaller viewports',
 });
 
 test('closed doors open on hover, focus and click; input offsets and pixel arrows are applied', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/?version=mvp');
   await page.locator('#nickname').fill('지구인');
   await page.locator('#password').fill('test-password');
   for (const field of ['#nickname', '#password']) {
@@ -158,7 +160,7 @@ test('closed doors open on hover, focus and click; input offsets and pixel arrow
 });
 
 test('friend dialogue is left aligned and pixel doors keep their frame when opened', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/?version=mvp');
   await page.getByRole('button', { name: '게임 시작', exact: true }).first().click();
   const tutorialClosed = await doorFrame(page, 1);
   await page.getByRole('button', { name: '친구 이야기 시작', exact: true }).hover();
@@ -174,7 +176,7 @@ test('friend dialogue is left aligned and pixel doors keep their frame when open
     expect(centered).toEqual({ align: 'left', vertical: 'center' });
     await waitForAssets(page);
     await page.screenshot({ path: `artifacts/screenshots/left-friend-${id.replace(':', '-')}.png` });
-    const arrow = await page.locator('.next-arrow-control > .pixel-next-arrow').boundingBox();
+    const arrow = await page.locator('.pixel-next-arrow').boundingBox();
     // Click inside the bubble, away from the icon itself, in the expanded target.
     await page.mouse.click(arrow.x + arrow.width / 2 - 40, arrow.y + arrow.height / 2 - 20);
     await expect(page.locator('.game-stage')).not.toHaveAttribute('data-scene-id', id);
@@ -189,13 +191,13 @@ test('friend dialogue is left aligned and pixel doors keep their frame when open
 });
 
 test('career introduction uses the same left aligned bubble and nearby clicks advance', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/?version=mvp');
   await page.getByRole('button', { name: '게임 시작', exact: true }).first().click();
   await page.getByRole('button', { name: '진로 이야기 시작', exact: true }).click();
   await expect(page.locator('.game-stage')).toHaveAttribute('data-scene-id', '1:1054');
   for (const id of ['1:1054', '1:1124']) {
     await expect(page.locator('.intro-dialogue')).toHaveCSS('text-align', 'left');
-    const arrow = await page.locator('.next-arrow-control > .pixel-next-arrow').boundingBox();
+    const arrow = await page.locator('.pixel-next-arrow').boundingBox();
     await page.mouse.click(arrow.x + arrow.width / 2 - 40, arrow.y + arrow.height / 2 - 20);
     await expect(page.locator('.game-stage')).not.toHaveAttribute('data-scene-id', id);
   }

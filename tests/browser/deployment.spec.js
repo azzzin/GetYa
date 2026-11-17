@@ -21,7 +21,7 @@ test('production build loads fonts and game images from a GitHub Pages repositor
   try {
     const failed = [];
     page.on('response', response => { if (response.status() >= 400 && !response.url().endsWith('/favicon.ico')) failed.push(response.url()); });
-    await page.goto(`http://127.0.0.1:${server.address().port}/GetYa/`);
+    await page.goto(`http://127.0.0.1:${server.address().port}/GetYa/?version=mvp`);
     await page.evaluate(async () => {
       await document.fonts.ready;
       await Promise.all([...document.images].map(image => image.decode()));

@@ -4,4 +4,7 @@ import App from './App.jsx';
 import './figma.css';
 import './styles.css';
 
-createRoot(document.getElementById('root')).render(<React.StrictMode><App /></React.StrictMode>);
+const params = new URLSearchParams(location.search);
+const FinalGame = React.lazy(() => import('./final/FinalGame.jsx'));
+const View = params.get('version') === 'mvp' || params.has('endingPreview') ? App : FinalGame;
+createRoot(document.getElementById('root')).render(<React.StrictMode><React.Suspense fallback={null}><View /></React.Suspense></React.StrictMode>);

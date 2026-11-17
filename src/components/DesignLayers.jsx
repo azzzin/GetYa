@@ -4,9 +4,14 @@ import { alignedDoorImage, doorStates, originalNextArrow } from '../data/doorSta
 import { assetUrl } from '../assetUrl.js';
 
 // Render original Figma layers; all text remains editable in content.json.
-export default function DesignLayers({ layer, phase, actions, onAssetError, activeDoor }) {
+export default function DesignLayers({ layer, phase, actions, onAssetError, activeDoor, reveal }) {
   if (layer.textKey) {
     const text = content[layer.textKey];
+    if (reveal && Object.hasOwn(reveal.offsets, layer.textKey)) {
+      const offset = reveal.offsets[layer.textKey];
+      return <span aria-label={text}>{Array.from(text).map((character, index) =>
+        <span aria-hidden="true" key={index} className={`ending-letter${offset + index < reveal.visible ? ' is-visible' : ''}`}>{character}</span>)}</span>;
+    }
     return text === '1/4' && phase ? `${phase}/4` : text;
   }
   const { tag, children, ...attributes } = layer;
@@ -54,5 +59,5 @@ export default function DesignLayers({ layer, phase, actions, onAssetError, acti
     props.className += ' image-button';
   }
   return createElement(action ? 'button' : tag, props,
-    ...children.map((child, index) => <DesignLayers key={index} layer={child} phase={phase} actions={actions} onAssetError={onAssetError} activeDoor={activeDoor} />));
+    ...children.map((child, index) => <DesignLayers key={index} layer={child} phase={phase} actions={actions} onAssetError={onAssetError} activeDoor={activeDoor} reveal={reveal} />));
 }

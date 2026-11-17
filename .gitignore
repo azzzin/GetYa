@@ -5,6 +5,7 @@ artifacts/
 .tools/
 test-results/
 GetYa-share.zip
+pages-review/
 
 # Local credentials and account settings must never be committed.
 .env

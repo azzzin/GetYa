@@ -41,9 +41,17 @@ button { -webkit-tap-highlight-color: transparent; }
 .next-arrow-control:focus-visible { outline: none; }
 .next-arrow-control:focus-visible::after { outline: 4px dashed #0034ad; outline-offset: -4px; }
 .next-arrow-control:hover > .pixel-next-arrow { background: #0034ad; }
+.dialogue-advance { position: absolute; z-index: 5; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.dialogue-advance:focus-visible { outline: 4px dashed #0034ad; outline-offset: -12px; }
 .pixel-progress { background: #b9e84c; border-radius: 0; clip-path: polygon(12px 0, calc(100% - 12px) 0, calc(100% - 12px) 6px, calc(100% - 6px) 6px, calc(100% - 6px) 12px, 100% 12px, 100% calc(100% - 12px), calc(100% - 6px) calc(100% - 12px), calc(100% - 6px) calc(100% - 6px), calc(100% - 12px) calc(100% - 6px), calc(100% - 12px) 100%, 12px 100%, 12px calc(100% - 6px), 6px calc(100% - 6px), 6px calc(100% - 12px), 0 calc(100% - 12px), 0 12px, 6px 12px, 6px 6px, 12px 6px); }
 .intro-dialogue { left: 535px; top: 192px; width: 983px; height: 330px; display: flex; flex-direction: column; align-items: stretch; justify-content: center; text-align: left; }
 input::placeholder { color: #555; opacity: 1; }
 .notice { position: fixed; z-index: 20; bottom: max(20px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: max-content; max-width: calc(100vw - 32px); background: #fff; border: 3px solid #0034ad; padding: 14px 18px; box-shadow: 5px 5px 0 #131326; font-size: 16px; line-height: 1.6; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.ending-letter { display: inline-block; white-space: pre; opacity: 0; }
+.ending-letter.is-visible { animation: ending-letter-in 160ms ease-out both; }
+@keyframes ending-letter-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+.ending-preview-bar { position: fixed; z-index: 30; bottom: 12px; left: 12px; display: flex; flex-wrap: wrap; gap: 14px; padding: 10px 14px; border: 2px solid #b9e84c; background: #101b35; color: #fff; font-size: 14px; }
+.ending-preview-bar a { color: #b9e84c; }
+@media (prefers-reduced-motion: reduce) { .ending-letter.is-visible { animation: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }

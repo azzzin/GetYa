@@ -5,6 +5,14 @@ import { gameReducer, initialGame, scenes } from './data/story.js';
 import { settings } from './data/settings.js';
 import { createGameAudio } from './audio.js';
 import { assetUrl } from './assetUrl.js';
+import { useEndingTypewriter } from './useEndingTypewriter.js';
+import DialogueAdvance from './components/DialogueAdvance.jsx';
+
+const previewRoute = import.meta.env.DEV ? new URLSearchParams(location.search).get('endingPreview') : null;
+const previewEnabled = ['career', 'friend'].includes(previewRoute);
+function initialPreviewGame() {
+  return previewEnabled ? { sceneId: previewRoute === 'friend' ? '1:665' : '1:1624', route: previewRoute, history: [] } : initialGame();
+}
 
 function useStageScale() {
   const [scale, setScale] = useState(() => Math.min(innerWidth / 1920, innerHeight / 1080));
@@ -23,7 +31,7 @@ function HitButton({ rect, label, onClick, disabled = false, title, ...events })
 }
 
 export default function App() {
-  const [game, dispatch] = useReducer(gameReducer, undefined, initialGame);
+  const [game, dispatch] = useReducer(gameReducer, undefined, initialPreviewGame);
   const [nickname, setNickname] = useState('');
   const [notice, setNotice] = useState('');
   const [soundEnabled, setSoundEnabled] = useState(false);
@@ -34,6 +42,7 @@ export default function App() {
   const stage = useRef(null);
   const scale = useStageScale();
   const current = scenes[game.sceneId];
+  const typewriter = useEndingTypewriter(game.sceneId, previewEnabled);
 
   useEffect(() => {
     setActiveDoor(null);
@@ -69,6 +78,10 @@ export default function App() {
   }, [game.sceneId, current]);
 
   const advance = choiceIndex => {
+    if (choiceIndex == null && typewriter.typing) {
+      typewriter.finish();
+      return;
+    }
     audio.current?.click();
     dispatch({ type: 'advance', choiceIndex });
   };
@@ -110,7 +123,7 @@ export default function App() {
   };
   const keyDown = event => {
     if (event.target !== stage.current || event.repeat || !['Enter', ' '].includes(event.key)) return;
-    if (!current.next || current.kind === 'start') return;
+    if ((!current.next && !typewriter.typing) || current.kind === 'start') return;
     event.preventDefault();
     advance();
   };
@@ -118,14 +131,17 @@ export default function App() {
   return <main className="game-shell">
     <div className="stage-wrapper" style={{ width: 1920 * scale, height: 1080 * scale }}>
       <section ref={stage} tabIndex={-1} className="game-stage" aria-label={current.title}
-        data-scene-id={game.sceneId} data-route={game.route ?? ''}
+        data-scene-id={game.sceneId} data-route={game.route ?? ''} data-typing={typewriter.typing}
         style={{ transform: `scale(${scale})` }} onKeyDown={keyDown}>
         <div className="visual-layers">
-          <DesignLayers layer={layouts[game.sceneId]} phase={current.phase} activeDoor={activeDoor}
+          <DesignLayers layer={layouts[game.sceneId]} phase={current.phase} activeDoor={activeDoor} reveal={typewriter.reveal}
             actions={{ home: restart, soundOn, soundOff, start,
-              next: current.next && !['start', 'result'].includes(current.kind) ? () => advance() : undefined }}
+              next: undefined }}
             onAssetError={() => setNotice('이미지를 불러오지 못했습니다. 새로고침해 주세요.')} />
         </div>
+
+        {((current.next && current.kind !== 'start') || typewriter.typing) &&
+          <DialogueAdvance sceneId={game.sceneId} scale={scale} onAdvance={() => advance()} />}
 
         {current.kind === 'start' && <form className="start-form" onSubmit={event => { event.preventDefault(); start(); }}>
           <label className="sr-only" htmlFor="nickname">닉네임 (선택)</label>
@@ -158,6 +174,12 @@ export default function App() {
         </>}
       </section>
     </div>
+    {previewEnabled && <nav className="ending-preview-bar" aria-label="로컬 엔딩 테스트">
+      <span>로컬 테스트 · 1글자 / 45ms</span>
+      <a href="?endingPreview=career">진로 엔딩</a>
+      <a href="?endingPreview=friend">친구 엔딩</a>
+      <a href={`?endingPreview=${previewRoute}`}>다시 보기</a>
+    </nav>}
     <p className="sr-only" role="status" aria-live="polite">{current.title}</p>
     <span className="sr-only">{soundEnabled ? '소리 켜짐' : '소리 꺼짐'}</span>
     {notice && <div className="notice" role="status">{notice}</div>}

@@ -1,0 +1,16 @@
+.final-target { position: absolute; z-index: 7; background: transparent; border: 0; padding: 0; cursor: pointer; }
+.final-target:hover { background: rgb(0 52 173 / 4%); }
+.final-target:focus-visible { outline: 4px dashed #0034ad; outline-offset: -5px; }
+.final-frame-next { position: absolute; inset: 0; z-index: 5; width: 100%; height: 100%; background: transparent; border: 0; cursor: pointer; }
+.final-frame-next:focus-visible { outline: 4px dashed #b9e84c; outline-offset: -10px; }
+.final-start-form { display: contents; }
+.final-username, .final-password { position: absolute; z-index: 6; left: 830px; width: 555px; height: 48px; padding: 0; border: 0; background: transparent; font-size: 24px; color: #000; }
+.final-username { top: 602px; }
+.final-password { top: 698px; }
+.final-review-input { position: absolute; z-index: 8; left: 215px; top: 310px; width: 1130px; height: 430px; resize: none; border: 0; background: transparent; font-size: 32px; line-height: 1.6; color: #000; padding: 10px; }
+.final-reviews { position: absolute; z-index: 8; left: 185px; top: 310px; width: 1195px; height: 305px; padding: 16px 24px; overflow: auto; font-size: 28px; line-height: 1.6; }
+.final-reviews article { border-bottom: 3px dashed #ddd; padding: 8px 0 24px; margin-bottom: 24px; }
+.final-reviews p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.final-empty-review { color: #666; }
+.final-local-note { position: fixed; z-index: 20; bottom: 8px; left: 8px; max-width: calc(100vw - 16px); background: #101b35; color: #b9e84c; border: 1px solid #b9e84c; padding: 7px 12px; font-size: 12px; }
+.final-game .game-stage[data-typing="false"] .ending-letter.is-visible { animation: none; opacity: 1; transform: none; }
