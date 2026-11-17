@@ -61,7 +61,7 @@ scenes['32:1273']['links'] = [
 ]
 # The next frame is not wired in the design. Keep it explicit for review.
 scenes['32:1823']['next'] = '32:2437'
-scenes['32:1823']['connectionNote'] = '엔딩 보기 → 바로 아래 노이즈 순서로 로컬 연결. 원본 프로토타입에는 연결 없음.'
+scenes['32:1823']['connectionNote'] = '사용자 확인: 엔딩 보기 → 노이즈 → 경고 → 진로 엔딩. 원본 프로토타입의 누락 연결을 보완.'
 scenes['32:1823']['links'] = [{'id': '32:1836', 'target': '32:2437', 'label': '엔딩 보기', 'rect': [1430, 818, 360, 135]}]
 
 (data / 'scenes.json').write_text(json.dumps(scenes, ensure_ascii=False, indent=2))
