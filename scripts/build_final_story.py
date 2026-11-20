@@ -59,6 +59,11 @@ scenes['32:1273']['links'] = [
     {'id': '32:1340', 'target': '32:826', 'label': '다시 하기', 'rect': [631, 851, 249, 104]},
     {'id': '32:1353', 'target': '32:905', 'label': '후기 남기기', 'rect': [1020, 851, 249, 104]},
 ]
+# The career ending now opens the same epilogue as the friend ending.
+for link in scenes['32:2309']['links']:
+    if link['id'] == '32:2395':
+        link.update(target='32:1029', label=content['32-2309-122'])
+
 # The next frame is not wired in the design. Keep it explicit for review.
 scenes['32:1823']['next'] = '32:2437'
 scenes['32:1823']['connectionNote'] = '사용자 확인: 엔딩 보기 → 노이즈 → 경고 → 진로 엔딩. 원본 프로토타입의 누락 연결을 보완.'

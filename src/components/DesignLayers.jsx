@@ -16,6 +16,7 @@ export default function DesignLayers({ layer, phase, actions, onAssetError, acti
   }
   const { tag, children, ...attributes } = layer;
   const nodeId = attributes['data-node-id'];
+  if (attributes.className === 'layer-27') return null; // The shared stage logo replaces the placeholder.
   // Input text is replaced with actual accessible controls in App.
   if (nodeId === '1:310' || nodeId === '1:312') return null;
   const name = attributes['data-name'];

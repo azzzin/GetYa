@@ -7,13 +7,9 @@
 .final-username, .final-password { position: absolute; z-index: 6; left: 830px; width: 555px; height: 48px; padding: 0; border: 0; background: transparent; font-size: 24px; color: #000; }
 .final-username { top: 602px; }
 .final-password { top: 698px; }
-.final-review-input { position: absolute; z-index: 8; left: 215px; top: 310px; width: 1130px; height: 430px; resize: none; border: 0; background: transparent; font-size: 32px; line-height: 1.6; color: #000; padding: 10px; }
-.final-reviews { position: absolute; z-index: 8; left: 185px; top: 310px; width: 1195px; height: 305px; padding: 16px 24px; overflow: auto; font-size: 28px; line-height: 1.6; }
-.final-reviews article { border-bottom: 3px dashed #ddd; padding: 8px 0 24px; margin-bottom: 24px; }
 .final-reviews p { white-space: pre-wrap; overflow-wrap: anywhere; }
 .final-empty-review { color: #666; }
 .final-local-note { position: fixed; z-index: 20; bottom: 8px; left: 8px; max-width: calc(100vw - 16px); background: #101b35; color: #b9e84c; border: 1px solid #b9e84c; padding: 7px 12px; font-size: 12px; }
-.final-game .game-stage[data-typing="false"] .ending-letter.is-visible { animation: none; opacity: 1; transform: none; }
 .final-game [data-transition-kind="noise"] .visual-layers { animation: tv-static-drift 320ms steps(4, end) infinite; transform-origin: center; }
 .final-game [data-transition-kind="warning"] .visual-layers { animation: tv-static-clear 450ms ease-out both; }
 @keyframes tv-static-drift {
@@ -26,3 +22,110 @@
 @media (prefers-reduced-motion: reduce) {
   .final-game [data-transition-kind] .visual-layers { animation: none; }
 }
+
+.final-game .ending-letter.is-visible { animation: none; opacity: 1; }
+.opening-background, .opening-bubble { position: absolute; }
+.opening-bubble { display: grid; place-items: center; }
+.opening-bubble img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.opening-bubble p { z-index: 1; margin: 0; color: #000; text-align: center; white-space: pre-line; }
+
+.final-survey {
+  position: absolute;
+  z-index: 8;
+  left: 210px;
+  top: 303px;
+  width: 1145px;
+  height: 483px;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  color: #161616;
+  font-size: 25px;
+}
+.final-survey-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 0 24px 16px 8px; }
+.final-survey fieldset { border: 0; border-bottom: 2px solid #e7e7e7; margin: 0 0 22px; padding: 0 0 16px; min-width: 0; }
+.final-survey legend { font-size: 30px; font-weight: bold; margin-bottom: 10px; }
+.survey-mode, .survey-limit { color: #525252; font-size: 22px; margin: 0 0 14px; }
+.survey-option { display: flex; align-items: center; gap: 14px; padding: 8px 12px; cursor: pointer; }
+.survey-option:has(input:checked) { background: #f0f6dc; }
+.survey-option input { width: 23px; height: 23px; flex: 0 0 auto; accent-color: #32613d; }
+.survey-other, .survey-body { display: grid; gap: 8px; margin: 12px 0; }
+.survey-other input, .survey-body textarea { width: 100%; border: 2px solid #8a8484; padding: 12px; font: inherit; }
+.survey-body textarea { min-height: 150px; resize: vertical; }
+.survey-actions { display: flex; justify-content: flex-end; gap: 16px; padding: 8px; border-top: 2px solid #e7e7e7; }
+.survey-actions button, .review-export { border: 2px solid #241b33; background: #e8f5bc; color: #221d25; padding: 8px 20px; font: inherit; cursor: pointer; }
+.survey-actions button:disabled { opacity: .5; cursor: default; }
+.final-reviews { position: absolute; z-index: 8; left: 216px; top: 281px; width: 1321px; height: 540px; padding: 0 48px 12px 0; overflow-y: auto; overscroll-behavior: contain; font-size: 28px; line-height: 1.6; }
+.final-reviews article {
+  width: min(100%, 950px);
+  min-height: 365px;
+  border: solid transparent;
+  border-width: 55px 52px 63px 62px;
+  border-image: url('/assets/figma-37-2566.png') 55 52 63 62 fill stretch;
+  /* The exported panel has opaque white padding beyond its stepped edge. */
+  clip-path: polygon(
+    27px 16px, calc(100% - 27px) 16px, calc(100% - 27px) 23px,
+    calc(100% - 19px) 23px, calc(100% - 19px) 31px, calc(100% - 11px) 31px,
+    calc(100% - 11px) calc(100% - 33px), calc(100% - 19px) calc(100% - 33px),
+    calc(100% - 19px) calc(100% - 25px), calc(100% - 27px) calc(100% - 25px),
+    calc(100% - 27px) calc(100% - 18px), 27px calc(100% - 18px),
+    27px calc(100% - 25px), 19px calc(100% - 25px), 19px calc(100% - 33px),
+    11px calc(100% - 33px), 11px 31px, 19px 31px, 19px 23px, 27px 23px
+  );
+  margin: 0 0 8px;
+  padding: 0 12px;
+  color: #1b1717;
+  overflow-wrap: anywhere;
+}
+.final-reviews article strong { display: block; margin-bottom: 8px; }
+.final-reviews article p { margin: 0; }
+.final-empty-review { display: inline-block; background: #fff; padding: 12px 16px; }
+.review-export { position: absolute; z-index: 9; top: 180px; left: 1010px; font-size: 24px; }
+
+.final-reviews { scrollbar-width: none; }
+.final-reviews::-webkit-scrollbar { display: none; }
+.final-review-scrollbar { position: absolute; z-index: 9; left: 1480px; top: 269px; width: 63px; height: 556px; }
+.final-review-scrollbar > img { display: block; pointer-events: none; }
+.final-review-scrollbar button {
+  position: absolute;
+  inset-inline: 4px;
+  height: 47px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.final-review-scrollbar button:disabled { cursor: default; }
+.review-scroll-up { top: 6px; }
+.review-scroll-down { bottom: 6px; }
+.final-review-scrollbar input {
+  appearance: none;
+  position: absolute;
+  top: 69px;
+  left: 5px;
+  width: 53px;
+  height: 423px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  writing-mode: vertical-lr;
+  direction: ltr;
+  cursor: ns-resize;
+}
+.final-review-scrollbar input:disabled { cursor: default; }
+.final-review-scrollbar input::-webkit-slider-thumb {
+  appearance: none;
+  width: 37px;
+  height: 82px;
+  background: var(--review-scroll-thumb) no-repeat center;
+}
+.final-review-scrollbar input::-moz-range-thumb {
+  width: 37px;
+  height: 82px;
+  border: 0;
+  background: var(--review-scroll-thumb) no-repeat center;
+}
+.final-review-scrollbar :focus-visible { outline: 3px solid #b9e84c; }
+
+/* Fit the longer career epilogue label inside the original button art. */
+.final-game [data-node-id="32:2407"] { inset-inline: 18px; font-size: 30px; }

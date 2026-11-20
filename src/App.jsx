@@ -1,4 +1,5 @@
 import { useEffect, useReducer, useRef, useState } from 'react';
+import GameLogo from './components/GameLogo.jsx';
 import DesignLayers from './components/DesignLayers.jsx';
 import layouts from './data/layouts.json';
 import { gameReducer, initialGame, scenes } from './data/story.js';
@@ -139,6 +140,7 @@ export default function App() {
               next: undefined }}
             onAssetError={() => setNotice('이미지를 불러오지 못했습니다. 새로고침해 주세요.')} />
         </div>
+        <GameLogo />
 
         {((current.next && current.kind !== 'start') || typewriter.typing) &&
           <DialogueAdvance sceneId={game.sceneId} scale={scale} onAdvance={() => advance()} />}

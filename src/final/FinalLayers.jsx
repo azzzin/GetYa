@@ -3,6 +3,9 @@ import { assetUrl } from '../assetUrl.js';
 import { alignedDoorImage, originalNextArrow } from '../data/doorStates.js';
 import content from './data/content.json';
 
+// Exported header groups containing old logos or placeholder rectangles.
+const logoLayers = new Set(['final-layer-26', 'final-layer-44', 'final-layer-79']);
+
 const standard = { closed: '/assets/33dea9ce-f866-42c5-a391-67e14772f796.png', open: '/assets/987c9697-34df-47b7-868f-5643ee0dc192.png' };
 const pixel = { closed: '/assets/5feb869b-3dcb-486f-b24f-1ff1813d45bc.png', open: '/assets/57a1e8d3-40b1-4340-8afc-aec07384dfd3.png' };
 
@@ -17,7 +20,15 @@ export default function FinalLayers({ layer, scene, activeDoor, actions, reveal 
   const { tag, children, ...props } = layer;
   const id = props['data-node-id'];
   const name = props['data-name'] ?? '';
-  if (['noise', 'warning'].includes(scene.kind) && tag === 'img' && props.src === originalNextArrow) return null;
+  if (logoLayers.has(props.className)) return null;
+  if (tag === 'img' && props.src === originalNextArrow) {
+    if (['noise', 'warning'].includes(scene.kind)) return null;
+    return <span className={`${props.className} pixel-next-arrow`} aria-hidden="true" />;
+  }
+  // Replace the old fixed-height mock reviews and decorative scrollbar with the live list.
+  if (scene.kind === 'reviews' && ['32:2509', '32:2528', '32:2541', '32:2546'].includes(id)) return null;
+  // The survey supplies these controls inside its own form.
+  if (scene.kind === 'review' && ['32:1003', '32:1016'].includes(id)) return null;
   if (['32:718', '32:720'].includes(id)) return null;
   if (['choice', 'topics'].includes(scene.kind) && /^(열린 문|닫힌 문|문 )/.test(name)) {
     const index = scene.kind === 'topics' ? (name === '문 3' ? 1 : 0) : name.startsWith('열린') ? 1 : 0;
