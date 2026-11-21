@@ -7,6 +7,7 @@ import FinalLayers from './FinalLayers.jsx';
 import DialogueAdvance from '../components/DialogueAdvance.jsx';
 import { useReveal } from './useReveal.js';
 import { assetUrl } from '../assetUrl.js';
+import { chapters } from './scenePresentation.js';
 import { autoTransitionDelay } from './transitionTiming.js';
 import baseScenes from './data/scenes.json';
 import opening from './data/opening.json';
@@ -50,6 +51,7 @@ export default function FinalGame() {
   const requested = reviewMode ? new URLSearchParams(location.search).get('scene') : null;
   const [sceneId, setSceneId] = useState(scenes[requested] ? requested : START);
   const scene = scenes[sceneId];
+  const chapter = chapters.get(sceneId);
   const stage = useRef(null);
   const timer = useRef(null);
   const [viewport, setViewport] = useState({ width: innerWidth, height: innerHeight });
@@ -81,6 +83,15 @@ export default function FinalGame() {
     };
     if (scene.next) collect(layouts[scene.next] ?? scenes[scene.next]);
     scene.links.forEach(link => collect(layouts[link.target]));
+
+    // Warm the full TV sequence on the preceding result screen. Loading an
+    // image should never extend the time a visitor spends in the static.
+    let upcoming = scenes[scene.next];
+    while (upcoming && autoTransitionDelay(upcoming, scenes[upcoming.next]) != null) {
+      collect(layouts[upcoming.id]);
+      upcoming = scenes[upcoming.next];
+      if (upcoming) collect(layouts[upcoming.id]);
+    }
     sources.forEach(source => { const image = new Image(); image.src = assetUrl(source); });
     return () => { clearTimeout(timer.current); timer.current = null; };
   }, [sceneId, scene.name]);
@@ -91,13 +102,8 @@ export default function FinalGame() {
   }, [notice]);
   useEffect(() => {
     if (automaticDelay == null || !scene.next) return;
-    let cancelled = false;
-    let handle;
-    // Start timing only after the static/background images are ready to show.
-    Promise.all([...stage.current.querySelectorAll('img')].map(image => image.decode().catch(() => {}))).then(() => {
-      if (!cancelled) handle = setTimeout(() => setSceneId(scene.next), automaticDelay);
-    });
-    return () => { cancelled = true; clearTimeout(handle); };
+    const handle = setTimeout(() => setSceneId(scene.next), automaticDelay);
+    return () => clearTimeout(handle);
   }, [sceneId, scene.next, automaticDelay]);
 
   const go = target => { if (scenes[target]) setSceneId(target); };
@@ -154,10 +160,11 @@ export default function FinalGame() {
       <section ref={stage} tabIndex={-1} className="game-stage" style={{ width: scene.width, height: scene.height, transform: `scale(${scale})` }}
         data-scene-id={sceneId} data-transition-kind={automaticDelay != null ? scene.kind : undefined}
         data-typing={reveal.typing} onKeyDown={keyDown} aria-label={scene.name}>
-        <div className="visual-layers">{scene.kind === 'opening' ? <Opening scene={scene} /> : <FinalLayers layer={layouts[sceneId]} scene={scene} activeDoor={activeDoor} reveal={reveal}
+        <div className="visual-layers">{scene.kind === 'opening' ? <Opening scene={scene} /> : <FinalLayers key={sceneId} layer={layouts[sceneId]} scene={scene} activeDoor={activeDoor} reveal={reveal}
           actions={{ home, sound, start, assetError: () => setNotice('이미지를 불러오지 못했습니다.') }} />}</div>
 
         <GameLogo />
+        {chapter && <div className="final-chapter pixel-progress" aria-label={`챕터 ${chapter}`}>1/{chapter}</div>}
 
         {scene.next && !['start', 'noise', 'warning'].includes(scene.kind) &&
           <DialogueAdvance sceneId={sceneId} scale={scale} onAdvance={next} />}

@@ -1,10 +1,13 @@
 import { createElement } from 'react';
 import { assetUrl } from '../assetUrl.js';
 import { alignedDoorImage, originalNextArrow } from '../data/doorStates.js';
+import { nyaLayerClass } from './scenePresentation.js';
 import content from './data/content.json';
 
 // Exported header groups containing old logos or placeholder rectangles.
 const logoLayers = new Set(['final-layer-26', 'final-layer-44', 'final-layer-79']);
+
+const oldProgressLayers = new Set(['final-layer-38', 'final-layer-39', 'final-layer-85']);
 
 const standard = { closed: '/assets/33dea9ce-f866-42c5-a391-67e14772f796.png', open: '/assets/987c9697-34df-47b7-868f-5643ee0dc192.png' };
 const pixel = { closed: '/assets/5feb869b-3dcb-486f-b24f-1ff1813d45bc.png', open: '/assets/57a1e8d3-40b1-4340-8afc-aec07384dfd3.png' };
@@ -20,7 +23,9 @@ export default function FinalLayers({ layer, scene, activeDoor, actions, reveal 
   const { tag, children, ...props } = layer;
   const id = props['data-node-id'];
   const name = props['data-name'] ?? '';
-  if (logoLayers.has(props.className)) return null;
+  if (logoLayers.has(props.className) || oldProgressLayers.has(props.className)) return null;
+  const entranceClass = nyaLayerClass(id);
+  if (entranceClass) props.className += ` ${entranceClass}`;
   if (tag === 'img' && props.src === originalNextArrow) {
     if (['noise', 'warning'].includes(scene.kind)) return null;
     return <span className={`${props.className} pixel-next-arrow`} aria-hidden="true" />;

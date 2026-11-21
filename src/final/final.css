@@ -129,3 +129,42 @@
 
 /* Fit the longer career epilogue label inside the original button art. */
 .final-game [data-node-id="32:2407"] { inset-inline: 18px; font-size: 30px; }
+
+.final-chapter {
+  position: absolute;
+  z-index: 4;
+  top: 137px;
+  left: 40px;
+  width: 131px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  color: #000;
+  font-size: 24px;
+}
+.nya-entrance {
+  transform-origin: center bottom;
+  animation: nya-bounce-in 520ms ease-out both;
+}
+.nya-entrance.nya-entrance-group {
+  display: block;
+  inset: 0;
+  pointer-events: none;
+  transform-origin: 82% 63%;
+}
+.nya-speech-entrance { animation: nya-speech-in 210ms 110ms ease-out both; }
+
+@keyframes nya-bounce-in {
+  0% { opacity: 0; translate: 0 40px; scale: .84 .78; }
+  24% { opacity: 1; translate: 0 -25px; scale: .92 1.13; }
+  52% { translate: 0 1px; scale: 1.18 .86; }
+  75% { translate: 0 -7px; scale: .97 1.04; }
+  100% { translate: 0 0; scale: 1 1; }
+}
+@keyframes nya-speech-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nya-entrance, .nya-speech-entrance { animation: none; }
+}

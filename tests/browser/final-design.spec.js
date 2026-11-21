@@ -227,3 +227,42 @@ test('career ending opens the epilogue and uses the pixel dialogue arrow', async
   await page.getByRole('button', { name: '다음 대사', exact: true }).click();
   await expect(stage).toHaveAttribute('data-scene-id', '32:1113');
 });
+
+test('slow noise artwork cannot prolong either ending transition', async ({ page }) => {
+  let releaseArtwork;
+  const pausedArtwork = new Promise(resolve => { releaseArtwork = resolve; });
+  await page.route('**/assets/55ed1dc2-6f11-4c80-b925-d64cd620704b.png', async route => {
+    await pausedArtwork;
+    await route.abort();
+  });
+  try {
+    for (const [first, ending] of [['32:2426', '32:1851'], ['32:2437', '32:1930']]) {
+      await page.goto(`/?scene=${first}&typing=off`, { waitUntil: 'domcontentloaded' });
+      const stage = page.locator('.game-stage');
+      await expect(stage).toHaveAttribute('data-scene-id', first);
+      await expect(stage).toHaveAttribute('data-scene-id', ending, { timeout: 3000 });
+    }
+  } finally {
+    releaseArtwork();
+  }
+});
+
+test('choice and consequence screens show their chapter and Nya enters with her dialogue', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  for (const [id, chapter] of [['32:1382', 1], ['32:1436', 2], ['32:1598', 3], ['32:1630', 4], ['32:1777', 4]]) {
+    await page.goto(`/?scene=${id}`);
+    const badge = page.locator('.final-chapter');
+    await expect(badge).toHaveText(`1/${chapter}`);
+    await expect(badge).toHaveCSS('background-color', 'rgb(185, 232, 76)');
+    await expect(badge).toHaveCSS('clip-path', /^polygon\(/);
+    if (id === '32:1436' || id === '32:1630') {
+      await expect(page.locator('.nya-entrance')).toHaveCSS('animation-name', 'nya-bounce-in');
+      await expect(page.locator('.nya-speech-entrance').first()).toHaveCSS('animation-name', 'nya-speech-in');
+    }
+  }
+
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/?scene=32:553');
+  await expect(page.locator('.nya-entrance')).toHaveCSS('animation-name', 'none');
+  await expect(page.getByRole('button', { name: '다음 대사', exact: true })).toBeVisible();
+});
